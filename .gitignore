@@ -1,0 +1,4 @@
+.tup
+tup.config
+*.o
+psp-save*

@@ -1,0 +1,24 @@
+ifdef CC
+ CC = @(CC)
+else
+ CC = gcc
+endif
+
+ifdef CFLAGS
+ CFLAGS = @(CFLAGS)
+else
+ CFLAGS += -Wall
+ CFLAGS += -Wpedantic
+ CFLAGS += -Wextra
+ CFLAGS += -std=c99
+ CFLAGS += -pedantic
+endif
+
+ifdef TARGET
+ TARGET = @(TARGET)
+else
+ TARGET = psp-save
+endif
+
+!cc = |> $(CC) $(CFLAGS) -c %f -o %o |> %B.o
+
