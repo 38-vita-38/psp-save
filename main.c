@@ -231,15 +231,21 @@ void encrypt_file(FILE *in, FILE *out, const char *name, FILE *sfo_in,
         die("encrypt_file: read %d bytes, %d expected\n", tmp, SFO_LEN);
     }
 
-    if ((tmp = encrypt_data(mode, data, &len, &aligned_len, hash, key)))
-        printf("encrypt_data returned %d\n", tmp);
+    if ((tmp = encrypt_data(mode, data, &len, &aligned_len, hash, key))) {
+        free(data);
+        free(hash);
+        die("encrypt_data failed (%d)\n", tmp);
+    }
     if ((tmp = fwrite(data, 1, len, out)) != len) {
         free(data);
         free(hash);
         die("encrypt_file: wrote %d bytes, %d expected\n", tmp, len);
     }
     free(data);
-    update_hashes(sfo, SFO_LEN, name, hash, key ? 3 : 1);
+    if ((tmp = update_hashes(sfo, SFO_LEN, name, hash, key ? 3 : 1))) {
+        free(hash);
+        die("update_hashes failed (%d)\n", tmp);
+    }
     if ((tmp = fwrite(sfo, 1, SFO_LEN, sfo_out)) != SFO_LEN) {
         free(hash);
         die("encrypt_file: wrote %d bytes, %d expected\n", tmp, SFO_LEN);
