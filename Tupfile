@@ -1,5 +1,0 @@
-include_rules
-
-: foreach *.c libkirk/*.c |> !cc |>
-: *.o libkirk/*.o |> $(CC) %f -o %o |> $(TARGET)
-

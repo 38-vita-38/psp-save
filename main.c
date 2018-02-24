@@ -243,8 +243,8 @@ void encrypt_file(FILE *in, FILE *out, const char *name, FILE *sfo_in,
     }
     free(data);
     if ((tmp = update_hashes(sfo, SFO_LEN, name, hash, key ? 3 : 1))) {
-        free(hash);
-        die("update_hashes failed (%d)\n", tmp);
+        /*free(hash);*/
+        printf("update_hashes returned %d\n", tmp);
     }
     if ((tmp = fwrite(sfo, 1, SFO_LEN, sfo_out)) != SFO_LEN) {
         free(hash);
