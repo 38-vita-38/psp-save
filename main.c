@@ -103,7 +103,7 @@ int main(int argc, char **argv)
         }
         sfo_in = try_open(argv[7], "rb");
         sfo_out = try_open(argv[8], "wb");
-        encrypt_file(in, out, argv[5], sfo_in, sfo_out, key, mode);
+        encrypt_file(in, out, argv[6], sfo_in, sfo_out, key, mode);
         fclose(sfo_in);
         fclose(sfo_out);
     }
