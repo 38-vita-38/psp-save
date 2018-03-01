@@ -40,11 +40,8 @@
 
 const char *usage =
   "Usage:\n"
-  "  %s -d key mode data out\n"
-  "  %s -e key mode data out name sfo sfo_out\n"
-  "  mode is 1, 3 or 5\n"
-  "  key is the path to the 16-byte file containing the game key. the path is\n"
-  "  ignored (but must be present) if the mode is 1\n"
+  "  %s -d data out\n"
+  "  %s -e data out name sfo sfo_out\n"
   "  name is usually DATA.BIN for savegames\n";
 
 static int align16(unsigned int v)
@@ -67,51 +64,39 @@ int encrypt_data(unsigned int mode, unsigned char *data, int *dataLen,
 
 int main(int argc, char **argv)
 {
-    unsigned char *key = NULL;
-    int mode; /* 1 = no key, 3 and 5 use a key */
+    unsigned char key[] = {0x70, 0x55, 0x8A, 0xC5, 0xB3, 0xB7, 0x47, 0x0C, 0xB0,
+      0xE0, 0xC2, 0x71, 0xD0, 0xF5, 0xBA, 0x56};
+    int mode = 3; /* 1 = no key, 3 and 5 use a key */
     int decrypt;
     FILE *in, *out;
-    if (argc < 6) {
+    if (argc < 4) {
         printf(usage, argv[0], argv[0]);
         return 0;
-    }
-    mode = atoi(argv[3]);
-    if (!(mode == 1 || mode == 3 || mode == 5))
-        die("Wrong mode %d\n", mode);
-    if (mode != 1) {
-        FILE *fp;
-        if (!(key = malloc(16)))
-            die("Cannot allocate 16 bytes, what a shame\n");
-        fp = try_open(argv[2], "rb");
-        if (fread(key, 1, 16, fp) != 16)
-            die("Can't read the 16-byte key from %s\n", key);
     }
 
     decrypt = !strcmp(argv[1], "-d") ? 1 : !strcmp(argv[1], "-e") ? 0 : -1;
     if (decrypt == -1)
         die("Wrong operation %s; only -e and -d allowed\n", argv[1]);
-    in = try_open(argv[4], "rb");
-    out = try_open(argv[5], "wb");
+    in = try_open(argv[2], "rb");
+    out = try_open(argv[3], "wb");
     kirk_init();
     if (decrypt) { /* decryption */
         decrypt_file(in, out, key, mode);
     } else { /* encryption */
         FILE *sfo_in, *sfo_out;
-        if (argc < 9) {
+        if (argc < 7) {
             printf(usage, argv[0], argv[0]);
             return 0;
         }
-        sfo_in = try_open(argv[7], "rb");
-        sfo_out = try_open(argv[8], "wb");
-        encrypt_file(in, out, argv[6], sfo_in, sfo_out, key, mode);
+        sfo_in = try_open(argv[5], "rb");
+        sfo_out = try_open(argv[6], "wb");
+        encrypt_file(in, out, argv[4], sfo_in, sfo_out, key, mode);
         fclose(sfo_in);
         fclose(sfo_out);
     }
 
     fclose(in);
     fclose(out);
-    if (key)
-        free(key);
     return 0;
 }
 

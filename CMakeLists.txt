@@ -12,4 +12,4 @@ set(SRCS
 
 set(SRCS ${SRCS})
 
-add_executable(psp-save ${SRCS})
+add_executable(psp-save-lcs ${SRCS})
